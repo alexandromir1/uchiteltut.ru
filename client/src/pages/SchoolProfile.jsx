@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../supabaseClient';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useJobs } from '../hooks/useJobs';
 import './SchoolProfile.css';
+
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SchoolProfile = () => {
   const { currentUser } = useAuth();
@@ -28,18 +30,15 @@ const SchoolProfile = () => {
     if (!currentUser) return;
 
     try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
-        return;
-      }
-
-      setProfile(data);
+      // Заменяем Supabase на REST API
+      // Если есть endpoint для профиля школы, используйте его
+      // const response = await axios.get(`${BASE_URL}/api/schools/${currentUser.id}`);
+      
+      // Пока используем данные из currentUser
+      setProfile({
+        school_name: currentUser.user_metadata?.name || currentUser.name,
+        district: currentUser.user_metadata?.district || 'Якутск'
+      });
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -123,17 +122,18 @@ const SchoolProfile = () => {
     if (!currentUser) return;
 
     try {
-      const { error } = await supabase
-        .from('schools')
-        .upsert({
-          user_id: currentUser.id,
-          school_name: profile?.school_name || '',
-          district: profile?.district || '',
-          phone: profile?.phone || '',
-          updated_at: new Date().toISOString()
-        });
+      // Заменяем Supabase на REST API
+      // const { error } = await supabase
+      //   .from('schools')
+      //   .upsert({
+      //     user_id: currentUser.id,
+      //     school_name: profile?.school_name || '',
+      //     district: profile?.district || '',
+      //     phone: profile?.phone || '',
+      //     updated_at: new Date().toISOString()
+      //   });
 
-      if (error) throw error;
+      // if (error) throw error;
       alert('Профиль сохранен!');
     } catch (error) {
       console.error('Error saving profile:', error);

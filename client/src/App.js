@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from './apolloClient';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -17,28 +19,30 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router basename={process.env.PUBLIC_URL}>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/register/teacher" element={<TeacherRegister />} />
-            <Route path="/register/school" element={<SchoolRegister />} />
-            <Route path="/job/:id" element={<JobDetail />} />
-            <Route path="/profile/teacher" element={<TeacherProfile />} />
-            <Route path="/profile/school" element={<SchoolProfile />} />
-            <Route path="/dashboard/teacher" element={<TeacherDashboard />} />
-            <Route path="/dashboard/school" element={<SchoolDashboard />} />
-            <Route path="/my-responses" element={<MyResponses />} />
-            <Route path="/resumes" element={<TeacherResumes />} />
-            {/* Fallback route */}
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <ApolloProvider client={apolloClient}>
+      <AuthProvider>
+        <Router basename={process.env.PUBLIC_URL}>
+          <div className="App">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/register/teacher" element={<TeacherRegister />} />
+              <Route path="/register/school" element={<SchoolRegister />} />
+              <Route path="/job/:id" element={<JobDetail />} />
+              <Route path="/profile/teacher" element={<TeacherProfile />} />
+              <Route path="/profile/school" element={<SchoolProfile />} />
+              <Route path="/dashboard/teacher" element={<TeacherDashboard />} />
+              <Route path="/dashboard/school" element={<SchoolDashboard />} />
+              <Route path="/my-responses" element={<MyResponses />} />
+              <Route path="/resumes" element={<TeacherResumes />} />
+              {/* Fallback route */}
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ApolloProvider>
   );
 }
 
