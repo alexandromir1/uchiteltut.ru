@@ -16,7 +16,7 @@ export const Header = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
-  background-image: url(${props => props.backgroundImage});
+  background-image: ${props => props.$backgroundImage ? `url(${props.$backgroundImage})` : 'none'};
 `;
 
 export const Bar = styled.div`

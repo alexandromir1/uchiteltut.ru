@@ -90,7 +90,7 @@ const Home = () => {
 
   // 🔹 Хедер (общий для всех состояний)
   const HeaderComponent = ({ jobCount }) => (
-    <Header backgroundImage={`url(${background})`}>
+    <Header $backgroundImage={background}>
       <Bar>
         <HeaderLeft>
           <Link to={'/'}>
