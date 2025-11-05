@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import herb from "../../assets/herb.png";
@@ -51,6 +51,85 @@ import {
   CategoryText,
 } from './styles';
 
+// 🔹 Выносим HeaderComponent наружу и мемоизируем его
+const HeaderComponent = React.memo(({ 
+  jobCount, 
+  searchQuery, 
+  onSearchChange,
+  currentUser,
+  isMenuOpen,
+  menuRef,
+  onMenuToggle,
+  onProfileClick,
+  onResumesClick,
+  onLogoutClick,
+  onLoginClick,
+}) => (
+  <Header $backgroundImage={background}>
+    <Bar>
+      <HeaderLeft>
+        <Link to={'/'}>
+          <Herb src={herb} alt="Герб" />
+        </Link>
+        <HeaderTitle>Республика Саха (Якутия)</HeaderTitle>
+      </HeaderLeft>
+
+      <HeaderRight>
+        <HeaderVakancies>Вакансии: {jobCount}</HeaderVakancies>
+
+        {currentUser ? (
+          <UserSection ref={menuRef}>
+            <UserName>Привет, {currentUser.name}</UserName>
+
+            <ProfileIconContainer onClick={onMenuToggle}>
+              <ProfileIcon
+                src={profileIcon}
+                alt="Профиль"
+              />
+            </ProfileIconContainer>
+
+            {isMenuOpen && (
+              <DropdownMenu>
+                <DropdownItem onClick={onProfileClick}>
+                  🧑‍🏫 Мой профиль
+                </DropdownItem>
+                {currentUser.role === "school" && (
+                  <DropdownItem onClick={onResumesClick}>
+                    📄 Резюме учителей
+                  </DropdownItem>
+                )}
+                <DropdownItem danger onClick={onLogoutClick}>
+                  🚪 Выйти
+                </DropdownItem>
+              </DropdownMenu>
+            )}
+          </UserSection>
+        ) : (
+          <HeaderRightLogin onClick={onLoginClick}>
+            <HeaderRightLoginLink>Войти</HeaderRightLoginLink>
+          </HeaderRightLogin>
+        )}
+      </HeaderRight>
+    </Bar>
+
+    <Title>Найдите работу мечты</Title>
+    <Text>
+      Лучшие вакансии для учителей по всему Региону
+    </Text>
+
+    <InputContainer>
+      <Input
+        placeholder="Поиск вакансий..."
+        value={searchQuery}
+        onChange={onSearchChange}
+      />
+      <SearchButton>
+        <span style={{ color: "#fff" }}>🔍</span>
+      </SearchButton>
+    </InputContainer>
+  </Header>
+));
+
 const Home = () => {
   const { jobs, loading, error } = useJobs();
   const { currentUser, logout } = useAuth();
@@ -72,10 +151,10 @@ const Home = () => {
   }, []);
 
   // Исправленный поиск
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-  };
+  }, []);
 
   // Исправленный useMemo для фильтрации
   const displayJobs = useMemo(() => {
@@ -88,97 +167,48 @@ const Home = () => {
     );
   }, [jobs, searchQuery]);
 
-  // 🔹 Хедер (общий для всех состояний)
-  const HeaderComponent = ({ jobCount }) => (
-    <Header $backgroundImage={background}>
-      <Bar>
-        <HeaderLeft>
-          <Link to={'/'}>
-            <Herb src={herb} alt="Герб" />
-          </Link>
-          <HeaderTitle>Республика Саха (Якутия)</HeaderTitle>
-        </HeaderLeft>
+  // Мемоизируем обработчики для меню
+  const handleMenuToggle = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, []);
 
-        <HeaderRight>
-          <HeaderVakancies>Вакансии: {jobCount}</HeaderVakancies>
+  const handleProfileClick = useCallback(() => {
+    navigate(
+      currentUser?.role === "teacher"
+        ? "/profile/teacher"
+        : "/profile/school"
+    );
+  }, [navigate, currentUser?.role]);
 
-          {currentUser ? (
-            <UserSection ref={menuRef}>
-              <UserName>Привет, {currentUser.name}</UserName>
+  const handleResumesClick = useCallback(() => {
+    navigate("/resumes");
+  }, [navigate]);
 
-              <ProfileIconContainer
-                onClick={() => setIsMenuOpen((prev) => !prev)}
-              >
-                <ProfileIcon
-                  src={profileIcon}
-                  alt="Профиль"
-                />
-              </ProfileIconContainer>
+  const handleLogoutClick = useCallback(() => {
+    logout();
+    navigate("/");
+  }, [logout, navigate]);
 
-              {isMenuOpen && (
-                <DropdownMenu>
-                  <DropdownItem
-                    onClick={() =>
-                      navigate(
-                        currentUser.role === "teacher"
-                          ? "/profile/teacher"
-                          : "/profile/school"
-                      )
-                    }
-                  >
-                    🧑‍🏫 Мой профиль
-                  </DropdownItem>
-                  {currentUser.role === "school" && (
-                    <DropdownItem
-                      onClick={() => navigate("/resumes")}
-                    >
-                      📄 Резюме учителей
-                    </DropdownItem>
-                  )}
-                  <DropdownItem
-                    danger
-                    onClick={() => {
-                      logout();
-                      navigate("/");
-                    }}
-                  >
-                    🚪 Выйти
-                  </DropdownItem>
-                </DropdownMenu>
-              )}
-            </UserSection>
-          ) : (
-            <HeaderRightLogin
-              onClick={() => navigate("/login")}
-            >
-              <HeaderRightLoginLink>Войти</HeaderRightLoginLink>
-            </HeaderRightLogin>
-          )}
-        </HeaderRight>
-      </Bar>
-
-      <Title>Найдите работу мечты</Title>
-      <Text>
-        Лучшие вакансии для учителей по всему Региону
-      </Text>
-
-      <InputContainer>
-        <Input
-          placeholder="Поиск вакансий..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-        <SearchButton>
-          <span style={{ color: "#fff" }}>🔍</span>
-        </SearchButton>
-      </InputContainer>
-    </Header>
-  );
+  const handleLoginClick = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
 
   if (loading)
     return (
       <Container>
-        <HeaderComponent jobCount={0} />
+        <HeaderComponent 
+          jobCount={0} 
+          searchQuery={searchQuery} 
+          onSearchChange={handleSearch}
+          currentUser={currentUser}
+          isMenuOpen={isMenuOpen}
+          menuRef={menuRef}
+          onMenuToggle={handleMenuToggle}
+          onProfileClick={handleProfileClick}
+          onResumesClick={handleResumesClick}
+          onLogoutClick={handleLogoutClick}
+          onLoginClick={handleLoginClick}
+        />
         <LoadingContainer>
           <LoadingText>Загрузка вакансий...</LoadingText>
         </LoadingContainer>
@@ -188,7 +218,19 @@ const Home = () => {
   if (error)
     return (
       <Container>
-        <HeaderComponent jobCount={0} />
+        <HeaderComponent 
+          jobCount={0} 
+          searchQuery={searchQuery} 
+          onSearchChange={handleSearch}
+          currentUser={currentUser}
+          isMenuOpen={isMenuOpen}
+          menuRef={menuRef}
+          onMenuToggle={handleMenuToggle}
+          onProfileClick={handleProfileClick}
+          onResumesClick={handleResumesClick}
+          onLogoutClick={handleLogoutClick}
+          onLoginClick={handleLoginClick}
+        />
         <ErrorContainer>
           <ErrorText>Ошибка загрузки данных 😢</ErrorText>
           <ErrorSubtext>Попробуйте обновить страницу</ErrorSubtext>
@@ -198,7 +240,19 @@ const Home = () => {
 
   return (
     <Container>
-      <HeaderComponent jobCount={jobs.length} />
+      <HeaderComponent 
+        jobCount={jobs.length} 
+        searchQuery={searchQuery} 
+        onSearchChange={handleSearch}
+        currentUser={currentUser}
+        isMenuOpen={isMenuOpen}
+        menuRef={menuRef}
+        onMenuToggle={handleMenuToggle}
+        onProfileClick={handleProfileClick}
+        onResumesClick={handleResumesClick}
+        onLogoutClick={handleLogoutClick}
+        onLoginClick={handleLoginClick}
+      />
 
       <Main>
         {displayJobs.length === 0 ? (
