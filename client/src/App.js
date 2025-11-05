@@ -15,6 +15,7 @@ import MyResponses from './pages/MyResponses';
 import TeacherRegister from './pages/TeacherRegister';
 import SchoolRegister from './pages/SchoolRegister';
 import TeacherResumes from './pages/TeacherResumes';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
               <Route path="/dashboard/school" element={<SchoolDashboard />} />
               <Route path="/my-responses" element={<MyResponses />} />
               <Route path="/resumes" element={<TeacherResumes />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               {/* Fallback route */}
               <Route path="*" element={<Home />} />
             </Routes>

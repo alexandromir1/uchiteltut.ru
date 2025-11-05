@@ -1,9 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useJobs } from '../hooks/useJobs';
-import './SchoolProfile.css';
+import { useJobs } from '../../hooks/useJobs';
+import {
+  SchoolProfileContainer,
+  ProfileHeader,
+  ProfileSection,
+  ProfileForm,
+  FormRow,
+  FormGroup,
+  Label,
+  Input,
+  Textarea,
+  EmailInfo,
+  AddJobSection,
+  JobForm,
+  JobsSection,
+  JobsList,
+  JobCard,
+  JobHeader,
+  JobInfo,
+  ButtonPrimary,
+  ButtonDanger,
+  LoadingContainer,
+  EmptyMessage,
+} from './styles';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -141,175 +163,191 @@ const SchoolProfile = () => {
     }
   };
 
-  if (loading) return <div className="loading">Загрузка...</div>;
+  if (loading) {
+    return (
+      <LoadingContainer>
+        Загрузка...
+      </LoadingContainer>
+    );
+  }
+
   if (!currentUser || currentUser.role !== 'school') {
     navigate('/login');
     return null;
   }
 
   return (
-    <div className="school-profile">
-      <div className="profile-header">
+    <SchoolProfileContainer>
+      <ProfileHeader>
         <h1>Профиль школы</h1>
-        <button
-          className="btn-primary"
-          onClick={() => navigate('/dashboard/school')}
-        >
+        <ButtonPrimary onClick={() => navigate('/dashboard/school')}>
           Панель управления
-        </button>
-      </div>
+        </ButtonPrimary>
+      </ProfileHeader>
 
-      <div className="profile-section">
+      <ProfileSection>
         <h2>Информация о школе</h2>
-        <div className="profile-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label>Название школы *</label>
-              <input
+        <ProfileForm>
+          <FormRow>
+            <FormGroup>
+              <Label>Название школы *</Label>
+              <Input
                 type="text"
                 value={profile?.school_name || ''}
                 onChange={(e) => setProfile({ ...profile, school_name: e.target.value })}
                 placeholder="Введите название школы"
               />
-            </div>
-            <div className="form-group">
-              <label>Район</label>
-              <input
+            </FormGroup>
+            <FormGroup>
+              <Label>Район</Label>
+              <Input
                 type="text"
                 value={profile?.district || ''}
                 onChange={(e) => setProfile({ ...profile, district: e.target.value })}
                 placeholder="Введите район"
               />
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Контактный телефон</label>
-            <input
+            </FormGroup>
+          </FormRow>
+          <FormGroup>
+            <Label>Контактный телефон</Label>
+            <Input
               type="tel"
               value={profile?.phone || ''}
               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
               placeholder="+7 (XXX) XXX-XX-XX"
             />
-          </div>
-          <p><strong>Email:</strong> {currentUser.email}</p>
-          <button className="btn-primary" onClick={saveProfile}>
+          </FormGroup>
+          <EmailInfo>
+            <strong>Email:</strong> {currentUser.email}
+          </EmailInfo>
+          <ButtonPrimary onClick={saveProfile}>
             Сохранить профиль
-          </button>
-        </div>
-      </div>
+          </ButtonPrimary>
+        </ProfileForm>
+      </ProfileSection>
 
-      <div className="add-job-section">
+      <AddJobSection>
         <h2>Добавить вакансию</h2>
-        <form onSubmit={handleAddJob} className="job-form">
-          <div className="form-row">
-            <input
+        <JobForm onSubmit={handleAddJob}>
+          <FormRow>
+            <Input
               type="text"
               placeholder="Должность *"
               value={newJob.position}
               onChange={(e) => setNewJob({ ...newJob, position: e.target.value })}
               required
             />
-            <input
+            <Input
               type="text"
               placeholder="Часы нагрузки"
               value={newJob.hours}
               onChange={(e) => setNewJob({ ...newJob, hours: e.target.value })}
             />
-          </div>
+          </FormRow>
 
-          <div className="form-row">
-            <input
+          <FormRow>
+            <Input
               type="text"
               placeholder="Зарплата"
               value={newJob.salary}
               onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
             />
-            <input
+            <Input
               type="text"
               placeholder="Жилье"
               value={newJob.housing}
               onChange={(e) => setNewJob({ ...newJob, housing: e.target.value })}
             />
-          </div>
+          </FormRow>
 
-          <textarea
+          <Textarea
             placeholder="Обязанности"
             value={newJob.duties}
             onChange={(e) => setNewJob({ ...newJob, duties: e.target.value })}
             rows="3"
           />
 
-          <textarea
+          <Textarea
             placeholder="Льготы и поддержка"
             value={newJob.benefits}
             onChange={(e) => setNewJob({ ...newJob, benefits: e.target.value })}
             rows="2"
           />
 
-          <div className="form-row">
-            <input
+          <FormRow>
+            <Input
               type="text"
               placeholder="Контакты"
               value={newJob.contacts}
               onChange={(e) => setNewJob({ ...newJob, contacts: e.target.value })}
             />
-            <input
+            <Input
               type="email"
               placeholder="Email для откликов"
               value={newJob.email}
               onChange={(e) => setNewJob({ ...newJob, email: e.target.value })}
             />
-          </div>
+          </FormRow>
 
-          <input
+          <Input
             type="text"
             placeholder="Поддержка для молодых специалистов"
             value={newJob.support}
             onChange={(e) => setNewJob({ ...newJob, support: e.target.value })}
           />
 
-          <input
+          <Input
             type="text"
             placeholder="Трудоустройство студентов"
             value={newJob.studentEmployment}
             onChange={(e) => setNewJob({ ...newJob, studentEmployment: e.target.value })}
           />
 
-          <button type="submit" className="btn-primary">
+          <ButtonPrimary type="submit">
             Добавить вакансию
-          </button>
-        </form>
-      </div>
+          </ButtonPrimary>
+        </JobForm>
+      </AddJobSection>
 
-      <div className="jobs-section">
+      <JobsSection>
         <h2>Мои вакансии ({schoolJobs.length})</h2>
         {schoolJobs.length === 0 ? (
-          <p>Нет добавленных вакансий</p>
+          <EmptyMessage>Нет добавленных вакансий</EmptyMessage>
         ) : (
-          <div className="jobs-list">
+          <JobsList>
             {schoolJobs.map(job => (
-              <div key={job.id} className="job-card">
-                <div className="job-header">
+              <JobCard key={job.id}>
+                <JobHeader>
                   <h3>{job.position}</h3>
-                  <button
-                    className="btn-danger"
-                    onClick={() => handleDeleteJob(job.id)}
-                  >
+                  <ButtonDanger onClick={() => handleDeleteJob(job.id)}>
                     Удалить
-                  </button>
-                </div>
-                <p><strong>Зарплата:</strong> {job.salary || 'Не указана'}</p>
-                <p><strong>Нагрузка:</strong> {job.hours || 'Не указана'}</p>
-                <p><strong>Жилье:</strong> {job.housing || 'Не указано'}</p>
-                <p><strong>Дата публикации:</strong> {new Date(job.openDate || job.created_at).toLocaleDateString('ru-RU')}</p>
-                {job.duties && <p><strong>Обязанности:</strong> {job.duties}</p>}
-              </div>
+                  </ButtonDanger>
+                </JobHeader>
+                <JobInfo>
+                  <strong>Зарплата:</strong> {job.salary || 'Не указана'}
+                </JobInfo>
+                <JobInfo>
+                  <strong>Нагрузка:</strong> {job.hours || 'Не указана'}
+                </JobInfo>
+                <JobInfo>
+                  <strong>Жилье:</strong> {job.housing || 'Не указано'}
+                </JobInfo>
+                <JobInfo>
+                  <strong>Дата публикации:</strong> {new Date(job.openDate || job.created_at).toLocaleDateString('ru-RU')}
+                </JobInfo>
+                {job.duties && (
+                  <JobInfo>
+                    <strong>Обязанности:</strong> {job.duties}
+                  </JobInfo>
+                )}
+              </JobCard>
             ))}
-          </div>
+          </JobsList>
         )}
-      </div>
-    </div>
+      </JobsSection>
+    </SchoolProfileContainer>
   );
 };
 
 export default SchoolProfile;
+

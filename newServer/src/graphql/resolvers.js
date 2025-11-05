@@ -111,6 +111,76 @@ export const resolvers = {
         },
       });
     },
+
+    // Get statistics
+    statistics: async () => {
+      const [
+        totalJobs,
+        activeJobs,
+        totalResponses,
+        totalTeachers,
+        totalSchools,
+        jobsByRegionRaw,
+        responsesByRegionRaw,
+        recentResponses,
+      ] = await Promise.all([
+        prisma.job.count(),
+        prisma.job.count({ where: { isActive: true } }),
+        prisma.response.count(),
+        prisma.teacher.count(),
+        prisma.school.count(),
+        prisma.job.groupBy({
+          by: ['region'],
+          _count: { region: true },
+          where: { region: { not: null } },
+        }),
+        prisma.$queryRaw`
+          SELECT j.region, COUNT(r.id) as count
+          FROM responses r
+          JOIN jobs j ON r."jobId" = j.id
+          WHERE j.region IS NOT NULL
+          GROUP BY j.region
+          ORDER BY count DESC
+        `,
+        prisma.response.findMany({
+          take: 10,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: true,
+            job: {
+              select: {
+                id: true,
+                position: true,
+                school: true,
+                region: true,
+              },
+            },
+            teacher: true,
+          },
+        }),
+      ]);
+
+      const jobsByRegion = jobsByRegionRaw.map((item) => ({
+        region: item.region || 'Не указан',
+        count: item._count.region,
+      }));
+
+      const responsesByRegion = responsesByRegionRaw.map((item) => ({
+        region: item.region || 'Не указан',
+        count: Number(item.count),
+      }));
+
+      return {
+        totalJobs,
+        activeJobs,
+        totalResponses,
+        totalTeachers,
+        totalSchools,
+        jobsByRegion,
+        responsesByRegion,
+        recentResponses,
+      };
+    },
   },
 
   Mutation: {

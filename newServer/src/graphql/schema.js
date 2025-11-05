@@ -117,6 +117,22 @@ export const typeDefs = gql`
     message: String
   }
 
+  type Statistics {
+    totalJobs: Int!
+    activeJobs: Int!
+    totalResponses: Int!
+    totalTeachers: Int!
+    totalSchools: Int!
+    jobsByRegion: [RegionStat!]!
+    responsesByRegion: [RegionStat!]!
+    recentResponses: [Response!]!
+  }
+
+  type RegionStat {
+    region: String!
+    count: Int!
+  }
+
   type Query {
     # Auth
     me: User
@@ -136,6 +152,9 @@ export const typeDefs = gql`
     # Responses
     responses(jobId: Int): [Response!]!
     response(id: ID!): Response
+
+    # Statistics
+    statistics: Statistics!
   }
 
   type Mutation {
