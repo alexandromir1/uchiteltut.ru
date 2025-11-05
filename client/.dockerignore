@@ -6,5 +6,7 @@ npm-debug.log
 .git
 .gitignore
 README.md
-QUICKSTART.md
+build
 *.log
+.DS_Store
+

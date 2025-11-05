@@ -17,8 +17,12 @@ const PORT = process.env.PORT || 4000;
 async function start() {
   try {
     // CORS
+    const allowedOrigins = process.env.CORS_ORIGINS 
+      ? process.env.CORS_ORIGINS.split(',')
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://client:80'];
+    
     await fastify.register(cors, {
-      origin: ['http://localhost:3000', 'http://localhost:3001'],
+      origin: allowedOrigins,
       credentials: true,
     });
 

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: teacher-portal-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-teacher_portal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-teacher_portal_password}
+      POSTGRES_DB: ${POSTGRES_DB:-teacher_portal_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-teacher_portal}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: ./newServer
+      dockerfile: Dockerfile
+    container_name: teacher-portal-server
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-teacher_portal}:${POSTGRES_PASSWORD:-teacher_portal_password}@postgres:5432/${POSTGRES_DB:-teacher_portal_db}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      PORT: 4000
+      NODE_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://client:80}
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./newServer/data:/app/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_GRAPHQL_URL: ${REACT_APP_GRAPHQL_URL:-http://localhost:4000/graphql}
+    container_name: teacher-portal-client
+    ports:
+      - "${CLIENT_PORT:-3000}:80"
+    depends_on:
+      - server
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
+
