@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "import-excel": "node src/scripts/importExcel.js"
   },
   "dependencies": {
     "@apollo/server": "^4.9.5",
