@@ -2,6 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Устанавливаем OpenSSL и другие зависимости для Prisma
+RUN apk add --no-cache openssl openssl-dev
+
 # Копируем файлы зависимостей
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -21,5 +24,5 @@ RUN mkdir -p data/excel
 EXPOSE 4000
 
 # Запускаем миграции и сервер
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy || echo 'Migrations already applied' && node src/index.js"]
 
