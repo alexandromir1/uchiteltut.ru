@@ -1,0 +1,116 @@
+.teacher-resumes {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.resumes-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.resumes-header h1 {
+  color: #313137;
+  font-family: 'Raleway', sans-serif;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.resumes-header p {
+  color: #666;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+}
+
+.search-section {
+  margin-bottom: 30px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.resumes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.resume-card {
+  background: #FAFAFF;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resume-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.resume-header h3 {
+  color: #313137;
+  font-family: 'Raleway', sans-serif;
+  margin: 0;
+  font-size: 20px;
+}
+
+.experience {
+  background: #E8F6FF;
+  color: #00516F;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.resume-details {
+  margin-bottom: 20px;
+}
+
+.resume-details p {
+  color: #313137;
+  font-family: 'Inter', sans-serif;
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.resume-actions {
+  text-align: center;
+}
+
+.no-resumes {
+  text-align: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
+.no-resumes p {
+  color: #666;
+  font-family: 'Raleway', sans-serif;
+  font-size: 18px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-family: 'Raleway', sans-serif;
+  color: #313137;
+  font-size: 18px;
+}
