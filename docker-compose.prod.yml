@@ -63,12 +63,26 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - client
       - server
     networks:
       - app-network
     restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: teacher-portal-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@uchiteltut.ru --agree-tos --no-eff-email -d uchiteltut.ru -d www.uchiteltut.ru
+    networks:
+      - app-network
+    restart: "no"
 
 volumes:
   postgres_data:
