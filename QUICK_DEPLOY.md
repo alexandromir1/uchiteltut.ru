@@ -31,6 +31,15 @@ git clone https://github.com/arri1/uchiteltut.ru.git uchiteltut
 cd uchiteltut
 ```
 
+**Или используйте автоматический скрипт деплоя:**
+
+```bash
+# Скачайте скрипт
+wget https://raw.githubusercontent.com/arri1/uchiteltut.ru/main/deploy-vps.sh
+chmod +x deploy-vps.sh
+sudo ./deploy-vps.sh
+```
+
 ## Шаг 4: Настройте переменные окружения
 
 ```bash
