@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import herb from "../assets/herb.png";
-import background from "../assets/background.png";
-import profileIcon from "../assets/teacherProfileIcon.png";
-import "../assets/Home.css";
+import herb from "../../assets/herb.png";
+import background from "../../assets/background.png";
+import profileIcon from "../../assets/teacherProfileIcon.png";
+import "../../assets/Home.css";
 
-import { useAuth } from "../context/AuthContext";
-import { useJobs } from "../hooks/useJobs";
+import { useAuth } from "../../context/AuthContext";
+import { useJobs } from "../../hooks/useJobs";
 
 const Home = () => {
   const { jobs, loading, error } = useJobs();
@@ -560,3 +560,4 @@ const styles = {
 };
 
 export default Home;
+
