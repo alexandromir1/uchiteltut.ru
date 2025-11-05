@@ -16,17 +16,21 @@ mkdir -p $PROJECT_DIR/certbot/www
 # Переходим в директорию проекта
 cd $PROJECT_DIR
 
-# Останавливаем nginx временно для получения сертификатов
-echo "⏸️  Временно останавливаем nginx..."
-docker-compose -f docker-compose.prod.yml stop nginx
+# Убеждаемся, что nginx работает в HTTP режиме для валидации
+echo "▶️  Запускаем nginx в HTTP режиме для валидации..."
+docker-compose -f docker-compose.prod.yml up -d nginx
+
+# Ждем запуска nginx
+echo "⏳ Ожидание запуска nginx..."
+sleep 5
 
 # Получаем сертификаты
 echo "📜 Получение SSL сертификатов..."
 docker-compose -f docker-compose.prod.yml run --rm certbot
 
-# Запускаем nginx обратно
-echo "▶️  Запускаем nginx с SSL..."
-docker-compose -f docker-compose.prod.yml up -d nginx
+# Перезапускаем nginx с SSL конфигурацией
+echo "🔄 Перезапускаем nginx с SSL..."
+docker-compose -f docker-compose.prod.yml restart nginx
 
 # Проверяем сертификаты
 if [ -f "$PROJECT_DIR/certbot/conf/live/$DOMAIN/fullchain.pem" ]; then
