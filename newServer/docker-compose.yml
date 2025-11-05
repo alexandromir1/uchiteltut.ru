@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: teacher-portal-postgres
+    environment:
+      POSTGRES_USER: teacher_portal
+      POSTGRES_PASSWORD: teacher_portal_password
+      POSTGRES_DB: teacher_portal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U teacher_portal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+

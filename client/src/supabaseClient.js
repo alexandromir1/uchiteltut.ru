@@ -1,6 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Временное решение - можно удалить после замены всех использований
+export const supabase = {
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: async () => ({ data: null, error: null })
+      })
+    }),
+    insert: () => ({
+      select: async () => ({ data: [], error: null })
+    }),
+    delete: () => ({
+      eq: async () => ({ error: null })
+    })
+  }),
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null })
+  }
+};

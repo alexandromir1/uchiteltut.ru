@@ -1,42 +1,30 @@
 import React, { useEffect } from "react";
-import { gql, useQuery } from "@apollo/client";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 import { useAuth } from "../context/AuthContext";
+import { GET_JOB } from "../graphql/queries";
 
-const GET_JOB = gql`
-  query GetJob($id: ID!) {
-    job(id: $id) {
-      id
-      position
-      school
-      hours
-      salary
-      housing
-      benefits
-      contacts
-      support
-      studentEmployment
-      duties
-      openDate
-      region
-      email
-    }
-  }
-`;
 function JobDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const { loading, error, data } = useQuery(GET_JOB, { variables: { id } });
+  
+  const { data, loading, error } = useQuery(GET_JOB, {
+    variables: { id },
+    skip: !id,
+    errorPolicy: 'all',
+  });
+
+  const job = data?.job;
 
   // ✅ сохраняем просмотренные вакансии у пользователя
   useEffect(() => {
-    if (data?.job && currentUser?.role === "teacher") {
+    if (job && currentUser?.role === "teacher") {
       const viewed = JSON.parse(localStorage.getItem("viewedJobs") || "[]");
-      const updated = [...new Set([...viewed, data.job.id])];
+      const updated = [...new Set([...viewed, job.id])];
       localStorage.setItem("viewedJobs", JSON.stringify(updated));
     }
-  }, [data, currentUser]);
+  }, [job, currentUser]);
 
   if (loading) return (
     <div style={styles.container}>
@@ -50,7 +38,7 @@ function JobDetail() {
     <div style={styles.container}>
       <div style={styles.error}>
         <p style={styles.errorText}>Ошибка загрузки вакансии</p>
-        <p style={styles.errorSubtext}>{error.message}</p>
+        <p style={styles.errorSubtext}>{error.message || error.response?.data?.error || 'Произошла ошибка'}</p>
         <button 
           onClick={() => navigate(-1)} 
           style={styles.backButton}
@@ -61,7 +49,19 @@ function JobDetail() {
     </div>
   );
 
-  const job = data.job;
+  if (!job) return (
+    <div style={styles.container}>
+      <div style={styles.error}>
+        <p style={styles.errorText}>Вакансия не найдена</p>
+        <button 
+          onClick={() => navigate(-1)} 
+          style={styles.backButton}
+        >
+          ← Назад
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div style={styles.container}>
@@ -164,11 +164,20 @@ function JobDetail() {
                 <span style={styles.contactLabel}>Дата открытия:</span>
                 <span style={styles.contactValue}>
                   {job.openDate
-                    ? new Date(Number(job.openDate)).toLocaleDateString("ru-RU", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })
+                    ? (() => {
+                        try {
+                          const date = typeof job.openDate === 'string' 
+                            ? new Date(job.openDate) 
+                            : new Date(Number(job.openDate));
+                          return date.toLocaleDateString("ru-RU", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          });
+                        } catch (e) {
+                          return "Не указана";
+                        }
+                      })()
                     : "Не указана"}
                 </span>
               </div>

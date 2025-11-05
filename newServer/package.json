@@ -1,0 +1,33 @@
+{
+  "name": "teacher-portal-graphql-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "GraphQL server with Apollo Server, Prisma, and PostgreSQL",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "npx prisma studio",
+    "prisma:seed": "node prisma/seed.js",
+    "import-excel": "node src/scripts/importExcel.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.9.5",
+    "@as-integrations/fastify": "^2.1.0",
+    "@fastify/cors": "^8.4.0",
+    "@prisma/client": "^5.7.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.1"
+  }
+}
+

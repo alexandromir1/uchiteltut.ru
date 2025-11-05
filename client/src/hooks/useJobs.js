@@ -1,93 +1,48 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_JOBS } from '../graphql/queries';
+import { CREATE_JOB, DELETE_JOB } from '../graphql/mutations';
 
 export const useJobs = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, error, refetch } = useQuery(GET_JOBS, {
+    variables: { active: true },
+    errorPolicy: 'all',
+  });
 
-  const fetchJobs = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false });
+  const [createJobMutation] = useMutation(CREATE_JOB, {
+    refetchQueries: [{ query: GET_JOBS, variables: { active: true } }],
+  });
 
-      if (error) throw error;
+  const [deleteJobMutation] = useMutation(DELETE_JOB, {
+    refetchQueries: [{ query: GET_JOBS, variables: { active: true } }],
+  });
 
-      console.log('Fetched jobs from Supabase:', data);
-
-      // Преобразуем данные в нужный формат
-      const formattedJobs = data.map(job => ({
-        id: job.id,
-        position: job.position,
-        school: job.school,
-        hours: job.hours,
-        salary: job.salary,
-        region: job.region,
-        housing: job.housing,
-        benefits: job.benefits,
-        contacts: job.contacts,
-        email: job.email,
-        support: job.support,
-        studentEmployment: job.student_employment,
-        duties: job.duties,
-        openDate: job.open_date || job.created_at,
-        school_id: job.school_id,
-        created_at: job.created_at
-      }));
-
-      setJobs(formattedJobs);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching jobs:', err);
-      setError(err.message);
-      // Тестовые данные
-      setJobs([
-        {
-          id: "1",
-          position: "Учитель математики",
-          school: "Тестовая школа №1",
-          region: "Якутск",
-          hours: "18 часов",
-          salary: "45000 руб.",
-          housing: "Предоставляется общежитие",
-          benefits: "Социальный пакет",
-          contacts: "+7 (999) 123-45-67",
-          email: "school1@example.com",
-          openDate: new Date().toISOString(),
-          school_id: "test-user-1"
-        }
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+  const jobs = data?.jobs || [];
 
   const addJob = async (jobData) => {
     try {
       console.log('Adding job:', jobData);
 
-      const { data, error } = await supabase
-        .from('jobs')
-        .insert([jobData])
-        .select();
+      const { data: result } = await createJobMutation({
+        variables: {
+          input: {
+            position: jobData.position,
+            school: jobData.school,
+            region: jobData.region,
+            hours: jobData.hours,
+            salary: jobData.salary,
+            housing: jobData.housing,
+            benefits: jobData.benefits,
+            contacts: jobData.contacts,
+            email: jobData.email,
+            support: jobData.support,
+            studentEmployment: jobData.student_employment || jobData.studentEmployment,
+            duties: jobData.duties,
+          },
+        },
+      });
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Job added successfully:', data);
-
-      // Обновляем список
-      await fetchJobs();
-      return data[0];
+      console.log('Job added successfully:', result);
+      return result?.createJob;
     } catch (err) {
       console.error('Error adding job:', err);
       throw err;
@@ -96,14 +51,9 @@ export const useJobs = () => {
 
   const deleteJob = async (jobId) => {
     try {
-      const { error } = await supabase
-        .from('jobs')
-        .delete()
-        .eq('id', jobId);
-
-      if (error) throw error;
-
-      setJobs(prev => prev.filter(job => job.id !== jobId));
+      await deleteJobMutation({
+        variables: { id: String(jobId) },
+      });
     } catch (err) {
       console.error('Error deleting job:', err);
       throw err;
@@ -113,8 +63,8 @@ export const useJobs = () => {
   return {
     jobs,
     loading,
-    error,
-    refetch: fetchJobs,
+    error: error?.message || null,
+    refetch,
     addJob,
     deleteJob
   };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import axios from 'axios';
 import './TeacherResumes.css';
+
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const TeacherResumes = () => {
   const [teachers, setTeachers] = useState([]);
@@ -13,13 +15,13 @@ const TeacherResumes = () => {
 
   const fetchTeachers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('teachers')
-        .select('*')
-        .eq('is_public', true);
-
-      if (error) throw error;
-      setTeachers(data || []);
+      // Заменяем Supabase на REST API
+      // Если есть endpoint для учителей, используйте его
+      // const response = await axios.get(`${BASE_URL}/api/teachers`);
+      // setTeachers(response.data.teachers || []);
+      
+      // Пока используем пустой массив или тестовые данные
+      setTeachers([]);
     } catch (error) {
       console.error('Error fetching teachers:', error);
     } finally {

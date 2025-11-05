@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String // "teacher" | "school"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  teacher   Teacher?
+  school    School?
+  jobs      Job[]
+  responses Response[]
+
+  @@map("users")
+}
+
+model Teacher {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  fullName       String
+  specialization String?
+  subjects       String?
+  experience     Int?
+  education      String?
+  qualification  String?
+  skills         String?
+  contactEmail   String?
+  contactPhone   String?
+  isPublic       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses Response[]
+
+  @@map("teachers")
+}
+
+model School {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  schoolName String
+  district   String?
+  phone      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs Job[]
+
+  @@map("schools")
+}
+
+model Job {
+  id                Int      @id @default(autoincrement())
+  schoolId          Int? // null для импортированных из Excel
+  userId            Int?
+  position          String
+  school            String
+  region            String?
+  hours             String?
+  salary            String?
+  housing           String?
+  benefits          String?
+  contacts          String?
+  email             String?
+  support           String?
+  studentEmployment String?
+  duties            String?
+  openDate          String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  schoolInfo School?    @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  user       User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  responses  Response[]
+
+  @@map("jobs")
+}
+
+model Response {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  jobId     Int
+  teacherId Int?
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job     Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@map("responses")
+}
+

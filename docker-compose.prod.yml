@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: teacher-portal-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    command: postgres -c listen_addresses='*'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+    restart: always
+    # Не пробрасываем порты наружу в production
+    # PostgreSQL слушает только на внутренней Docker сети
+
+  server:
+    build:
+      context: ./newServer
+      dockerfile: Dockerfile
+    container_name: teacher-portal-server
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 4000
+      NODE_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./newServer/data:/app/data
+    networks:
+      - app-network
+    restart: always
+    # Порты не пробрасываем наружу, доступ через nginx
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_GRAPHQL_URL: ${REACT_APP_GRAPHQL_URL}
+    container_name: teacher-portal-client
+    depends_on:
+      - server
+    networks:
+      - app-network
+    restart: always
+    # Порты не пробрасываем наружу, доступ через nginx
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: teacher-portal-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - client
+      - server
+    networks:
+      - app-network
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: teacher-portal-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@uchiteltut.ru --agree-tos --no-eff-email -d uchiteltut.ru -d www.uchiteltut.ru
+    networks:
+      - app-network
+    restart: "no"
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
