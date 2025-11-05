@@ -29,8 +29,6 @@ services:
       PORT: 4000
       NODE_ENV: production
       CORS_ORIGINS: ${CORS_ORIGINS}
-    ports:
-      - "4000:4000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,6 +37,7 @@ services:
     networks:
       - app-network
     restart: always
+    # Порты не пробрасываем наружу, доступ через nginx
 
   client:
     build:
@@ -47,9 +46,23 @@ services:
       args:
         REACT_APP_GRAPHQL_URL: ${REACT_APP_GRAPHQL_URL}
     container_name: teacher-portal-client
-    ports:
-      - "3000:80"
     depends_on:
+      - server
+    networks:
+      - app-network
+    restart: always
+    # Порты не пробрасываем наружу, доступ через nginx
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: teacher-portal-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - client
       - server
     networks:
       - app-network
