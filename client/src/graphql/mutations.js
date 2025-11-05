@@ -122,3 +122,24 @@ export const DELETE_RESPONSE = gql`
   }
 `;
 
+// User Mutations
+export const UPDATE_USER = gql`
+  mutation UpdateUser($input: UpdateUserInput!) {
+    updateUser(input: $input) {
+      id
+      email
+      name
+      role
+      teacher {
+        id
+        fullName
+      }
+      school {
+        id
+        schoolName
+        district
+      }
+    }
+  }
+`;
+

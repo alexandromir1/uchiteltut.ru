@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useMutation, useLazyQuery } from '@apollo/client';
-import { LOGIN, REGISTER } from '../graphql/mutations';
+import { LOGIN, REGISTER, UPDATE_USER } from '../graphql/mutations';
 import { ME } from '../graphql/queries';
 
 const AuthContext = createContext();
@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
   // Мутации
   const [loginMutation] = useMutation(LOGIN);
   const [registerMutation] = useMutation(REGISTER);
+  const [updateUserMutation] = useMutation(UPDATE_USER);
   const [fetchMe] = useLazyQuery(ME);
 
   // Проверяем сохраненную сессию
@@ -117,12 +118,53 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
   };
 
+  // 🔄 ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ
+  const updateUser = async (userData) => {
+    try {
+      // Отправляем запрос на сервер
+      const { data } = await updateUserMutation({
+        variables: {
+          input: {
+            name: userData.name,
+          },
+        },
+      });
+
+      if (data?.updateUser) {
+        // Обновляем локальное состояние
+        const updatedUser = { ...currentUser, ...data.updateUser };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      }
+    } catch (error) {
+      console.error('Ошибка обновления пользователя:', error);
+      // В случае ошибки обновляем локально (fallback)
+      const updatedUser = { ...currentUser, ...userData };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      throw error;
+    }
+  };
+
   const value = { 
     currentUser, 
     login, 
     logout, 
     register, 
-    loading
+    loading,
+    updateUser,
+    refetchUser: () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetchMe().then(({ data }) => {
+          if (data?.me) {
+            setCurrentUser(data.me);
+            localStorage.setItem('user', JSON.stringify(data.me));
+          }
+        });
+      }
+    }
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

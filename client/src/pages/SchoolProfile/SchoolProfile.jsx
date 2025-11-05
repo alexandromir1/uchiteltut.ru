@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useJobs } from '../../hooks/useJobs';
 import {
   SchoolProfileContainer,
@@ -23,6 +24,8 @@ import {
   JobInfo,
   ButtonPrimary,
   ButtonDanger,
+  ButtonBack,
+  ButtonGroup,
   LoadingContainer,
   EmptyMessage,
 } from './styles';
@@ -30,7 +33,7 @@ import {
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SchoolProfile = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, updateUser } = useAuth();
   const navigate = useNavigate();
   const { jobs, addJob, deleteJob, refetch } = useJobs();
   const [profile, setProfile] = useState(null);
@@ -80,7 +83,7 @@ const SchoolProfile = () => {
     e.preventDefault();
 
     if (!currentUser) {
-      alert('Пожалуйста, войдите в систему');
+      toast.error('Пожалуйста, войдите в систему');
       return;
     }
 
@@ -121,10 +124,10 @@ const SchoolProfile = () => {
       // Обновляем список вакансий
       refetch();
 
-      alert('Вакансия успешно добавлена!');
+      toast.success('Вакансия успешно добавлена!');
     } catch (error) {
       console.error('Error adding job:', error);
-      alert('Ошибка при добавлении вакансии: ' + error.message);
+      toast.error('Ошибка при добавлении вакансии: ' + error.message);
     }
   };
 
@@ -133,10 +136,10 @@ const SchoolProfile = () => {
 
     try {
       await deleteJob(jobId);
-      alert('Вакансия удалена');
+      toast.success('Вакансия успешно удалена');
     } catch (error) {
       console.error('Error deleting job:', error);
-      alert('Ошибка при удалении вакансии');
+      toast.error('Ошибка при удалении вакансии');
     }
   };
 
@@ -144,22 +147,19 @@ const SchoolProfile = () => {
     if (!currentUser) return;
 
     try {
-      // Заменяем Supabase на REST API
-      // const { error } = await supabase
-      //   .from('schools')
-      //   .upsert({
-      //     user_id: currentUser.id,
-      //     school_name: profile?.school_name || '',
-      //     district: profile?.district || '',
-      //     phone: profile?.phone || '',
-      //     updated_at: new Date().toISOString()
-      //   });
-
-      // if (error) throw error;
-      alert('Профиль сохранен!');
+      // Обновляем имя пользователя в AuthContext, если оно изменилось
+      if (profile?.school_name && profile.school_name !== currentUser.name) {
+        await updateUser({ name: profile.school_name });
+        toast.success('Профиль успешно сохранен!');
+      } else {
+        toast.success('Профиль сохранен локально!');
+      }
+      
+      // Здесь можно добавить сохранение дополнительных данных профиля школы на сервер через GraphQL API
+      // Например: await updateSchoolProfile(profile);
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Ошибка при сохранении профиля');
+      toast.error('Ошибка при сохранении профиля: ' + (error.message || 'Неизвестная ошибка'));
     }
   };
 
@@ -179,7 +179,12 @@ const SchoolProfile = () => {
   return (
     <SchoolProfileContainer>
       <ProfileHeader>
-        <h1>Профиль школы</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <ButtonBack onClick={() => navigate(-1)}>
+            ← Назад
+          </ButtonBack>
+          <h1>Профиль школы</h1>
+        </div>
         <ButtonPrimary onClick={() => navigate('/dashboard/school')}>
           Панель управления
         </ButtonPrimary>
@@ -220,9 +225,14 @@ const SchoolProfile = () => {
           <EmailInfo>
             <strong>Email:</strong> {currentUser.email}
           </EmailInfo>
-          <ButtonPrimary onClick={saveProfile}>
-            Сохранить профиль
-          </ButtonPrimary>
+          <ButtonGroup>
+            <ButtonPrimary onClick={saveProfile}>
+              Сохранить профиль
+            </ButtonPrimary>
+            <ButtonBack onClick={() => navigate(-1)}>
+              Отмена
+            </ButtonBack>
+          </ButtonGroup>
         </ProfileForm>
       </ProfileSection>
 

@@ -242,6 +242,32 @@ export const ButtonDanger = styled.button`
   }
 `;
 
+export const ButtonBack = styled.button`
+  background-color: transparent;
+  color: #2637A1;
+  border: 2px solid #2637A1;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #2637A1;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 export const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -258,5 +284,15 @@ export const EmptyMessage = styled.p`
   font-size: 16px;
   font-family: 'Inter', sans-serif;
   padding: 40px 0;
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 

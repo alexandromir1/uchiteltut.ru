@@ -157,10 +157,15 @@ export const typeDefs = gql`
     statistics: Statistics!
   }
 
+  input UpdateUserInput {
+    name: String
+  }
+
   type Mutation {
     # Auth
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
+    updateUser(input: UpdateUserInput!): User!
 
     # Jobs
     createJob(input: JobInput!): Job!

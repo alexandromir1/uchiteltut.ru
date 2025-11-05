@@ -9,7 +9,7 @@
     "dev": "node --watch src/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
+    "prisma:studio": "npx prisma studio",
     "prisma:seed": "node prisma/seed.js",
     "import-excel": "node src/scripts/importExcel.js"
   },

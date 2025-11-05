@@ -426,6 +426,30 @@ export const resolvers = {
 
       return true;
     },
+
+    // Update user
+    updateUser: async (parent, { input }, context) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) {
+        throw new Error('Необходима авторизация');
+      }
+
+      const updateData = {};
+      if (input.name !== undefined) {
+        updateData.name = input.name;
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        include: {
+          teacher: true,
+          school: true,
+        },
+      });
+
+      return updatedUser;
+    },
   },
 };
 

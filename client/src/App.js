@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
+import { Toaster } from 'react-hot-toast';
 import { apolloClient } from './apolloClient';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
@@ -23,6 +24,30 @@ function App() {
     <ApolloProvider client={apolloClient}>
       <AuthProvider>
         <Router basename={process.env.PUBLIC_URL}>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#52c41a',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 4000,
+                iconTheme: {
+                  primary: '#ff4d4f',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
           <div className="App">
             <Routes>
               <Route path="/" element={<Home />} />
