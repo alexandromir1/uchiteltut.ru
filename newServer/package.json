@@ -17,6 +17,7 @@
     "@apollo/server": "^4.9.5",
     "@as-integrations/fastify": "^2.1.0",
     "@fastify/cors": "^8.4.0",
+    "@fastify/multipart": "^7.7.4",
     "@prisma/client": "^5.7.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
@@ -24,6 +25,7 @@
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
     "pg": "^8.16.3",
     "xlsx": "^0.18.5"
   },

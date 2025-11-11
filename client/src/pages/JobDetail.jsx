@@ -6,6 +6,9 @@ import { GET_JOB } from "../graphql/queries";
 
 function JobDetail() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [form, setForm] = useState({ fio: '', phone: '', education: '', experience: '' });
+  const [resumeFile, setResumeFile] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -32,6 +35,44 @@ function JobDetail() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  const apiBase = (process.env.REACT_APP_GRAPHQL_URL || 'http://localhost:4000/graphql').replace(/\/graphql$/, '');
+
+  const handleSubmitApplication = async (e, jobData) => {
+    e.preventDefault();
+    if (!jobData) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('fio', form.fio);
+      formData.append('phone', form.phone);
+      formData.append('education', form.education);
+      formData.append('experience', form.experience);
+      formData.append('jobId', jobData.id);
+      if (jobData.email) formData.append('toEmail', jobData.email);
+      if (jobData.position) formData.append('jobTitle', jobData.position);
+      if (jobData.school) formData.append('school', jobData.school);
+      if (jobData.region) formData.append('region', jobData.region);
+      if (resumeFile) formData.append('resume', resumeFile);
+
+      const res = await fetch(`${apiBase}/api/respond`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Не удалось отправить отклик');
+      }
+
+      alert('Ваш отклик отправлен!');
+      setIsFormOpen(false);
+      setForm({ fio: '', phone: '', education: '', experience: '' });
+      setResumeFile(null);
+    } catch (err) {
+      alert(`Ошибка: ${err.message}`);
+    }
+  };
 
   if (loading) return (
     <div style={styles.container}>
@@ -195,7 +236,7 @@ function JobDetail() {
                 </div>
               )}
 
-              <button style={styles.applyButton}>
+              <button style={styles.applyButton} onClick={() => setIsFormOpen(true)}>
                 Откликнуться на вакансию
               </button>
 
@@ -208,6 +249,69 @@ function JobDetail() {
           </div>
         </div>
       </div>
+
+      {/* Modal: Application Form */}
+      {isFormOpen && (
+        <div style={styles.modalBackdrop} onClick={() => setIsFormOpen(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ marginTop: 0, marginBottom: 16 }}>Отправить отклик</h2>
+            <form onSubmit={(e) => handleSubmitApplication(e, job)}>
+              <div style={styles.formRow}>
+                <label style={styles.label}>ФИО</label>
+                <input
+                  style={styles.input}
+                  value={form.fio}
+                  onChange={(e) => setForm({ ...form, fio: e.target.value })}
+                  required
+                />
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>Телефон</label>
+                <input
+                  style={styles.input}
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="+7 (XXX) XXX-XX-XX"
+                  required
+                />
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>Образование</label>
+                <textarea
+                  style={styles.textarea}
+                  value={form.education}
+                  onChange={(e) => setForm({ ...form, education: e.target.value })}
+                />
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>Опыт работы</label>
+                <textarea
+                  style={styles.textarea}
+                  value={form.experience}
+                  onChange={(e) => setForm({ ...form, experience: e.target.value })}
+                />
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>Резюме (PDF, DOC, DOCX)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 16, justifyContent: 'flex-end' }}>
+                <button type="button" style={styles.backButton} onClick={() => setIsFormOpen(false)}>
+                  Отмена
+                </button>
+                <button type="submit" style={styles.applyButton}>
+                  Отправить отклик
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -442,6 +546,48 @@ const styles = {
     color: '#666',
     fontFamily: 'Raleway, sans-serif',
     marginBottom: 20
+  },
+  modalBackdrop: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2000
+  },
+  modal: {
+    background: '#fff',
+    padding: 24,
+    borderRadius: 12,
+    width: '100%',
+    maxWidth: 520,
+    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+  },
+  formRow: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    marginBottom: 12
+  },
+  label: {
+    fontSize: 14,
+    color: '#313137',
+    fontWeight: 500
+  },
+  input: {
+    border: '1px solid #ddd',
+    borderRadius: 8,
+    padding: '10px 12px',
+    fontSize: 14
+  },
+  textarea: {
+    border: '1px solid #ddd',
+    borderRadius: 8,
+    padding: '10px 12px',
+    fontSize: 14,
+    minHeight: 80,
+    resize: 'vertical'
   }
 };
 
