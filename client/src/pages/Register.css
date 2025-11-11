@@ -117,3 +117,22 @@
 .register-links a:hover {
   text-decoration: underline;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .register-card {
+    padding: 24px;
+  }
+
+  .register-options {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: 18px;
+    border-radius: 10px;
+  }
+}

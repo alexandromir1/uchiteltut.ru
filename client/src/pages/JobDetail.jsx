@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { useAuth } from "../context/AuthContext";
 import { GET_JOB } from "../graphql/queries";
 
 function JobDetail() {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -25,6 +26,12 @@ function JobDetail() {
       localStorage.setItem("viewedJobs", JSON.stringify(updated));
     }
   }, [job, currentUser]);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   if (loading) return (
     <div style={styles.container}>
@@ -75,8 +82,8 @@ function JobDetail() {
         </button>
       </div>
 
-      <div style={styles.content}>
-        <div style={styles.left}>
+      <div style={{ ...styles.content, ...(isMobile ? styles.contentMobile : {}) }}>
+        <div style={{ ...styles.left, ...(isMobile ? styles.leftMobile : {}) }}>
           {/* Заголовок */}
           <div style={styles.header}>
             <h1 style={styles.title}>{job.position}</h1>
@@ -126,7 +133,7 @@ function JobDetail() {
           )}
         </div>
 
-        <div style={styles.right}>
+        <div style={{ ...styles.right, ...(isMobile ? styles.rightMobile : {}) }}>
           {/* Боковая панель с контактами */}
           <div style={styles.sidebar}>
             <div style={styles.contactCard}>
@@ -234,6 +241,9 @@ const styles = {
     gap: 30,
     alignItems: 'flex-start'
   },
+  contentMobile: {
+    flexDirection: 'column'
+  },
   left: {
     flex: 2,
     background: '#FAFAFF',
@@ -241,9 +251,16 @@ const styles = {
     borderRadius: 20,
     boxShadow: '0 2px 20px rgba(0,0,0,0.08)'
   },
+  leftMobile: {
+    padding: 20
+  },
   right: {
     flex: 1,
     minWidth: 300
+  },
+  rightMobile: {
+    width: '100%',
+    minWidth: 'auto'
   },
   header: {
     marginBottom: 40,

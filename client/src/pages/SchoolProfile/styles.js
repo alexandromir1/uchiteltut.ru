@@ -21,6 +21,16 @@ export const ProfileHeader = styled.div`
     margin: 0;
     font-family: 'Raleway', sans-serif;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    h1 {
+      font-size: 24px;
+    }
+  }
 `;
 
 export const ProfileSection = styled.div`
@@ -218,6 +228,12 @@ export const ButtonPrimary = styled.button`
   &:active {
     transform: translateY(0);
   }
+
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+    font-size: 14px;
+    width: 100%;
+  }
 `;
 
 export const ButtonDanger = styled.button`
@@ -266,6 +282,13 @@ export const ButtonBack = styled.button`
   &:active {
     transform: translateY(0);
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
 `;
 
 export const LoadingContainer = styled.div`
@@ -293,6 +316,7 @@ export const ButtonGroup = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
+    width: 100%;
   }
 `;
 

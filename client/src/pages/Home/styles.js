@@ -45,7 +45,7 @@ export const Bar = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
-  z-index: 2;
+  z-index: 100;
 
   @media (max-width: 768px) {
     height: 60px;
@@ -184,7 +184,7 @@ export const DropdownMenu = styled.div`
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   padding: 10px 0;
-  z-index: 10;
+  z-index: 1000;
   min-width: 180px;
 `;
 
@@ -401,6 +401,11 @@ export const Item = styled.div`
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 `;
 

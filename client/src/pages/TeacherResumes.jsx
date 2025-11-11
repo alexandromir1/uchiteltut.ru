@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './TeacherResumes.css';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const TeacherResumes = () => {
+  const navigate = useNavigate();
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +42,13 @@ const TeacherResumes = () => {
   return (
     <div className="teacher-resumes">
       <div className="resumes-header">
+        <button
+          type="button"
+          className="back-button"
+          onClick={() => navigate('/')}
+        >
+          ← На главную
+        </button>
         <h1>Резюме учителей</h1>
         <p>Найдите подходящего кандидата для вашей школы</p>
       </div>

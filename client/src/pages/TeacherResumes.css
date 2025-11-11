@@ -38,7 +38,7 @@
 
 .resumes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
 
@@ -113,4 +113,25 @@
   font-family: 'Raleway', sans-serif;
   color: #313137;
   font-size: 18px;
+}
+
+.back-button {
+  background: transparent;
+  border: 2px solid #2637A1;
+  color: #2637A1;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .resumes-header h1 {
+    font-size: 28px;
+  }
+
+  .resumes-grid {
+    grid-template-columns: 1fr;
+  }
 }

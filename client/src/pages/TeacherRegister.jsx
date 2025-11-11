@@ -66,6 +66,13 @@ const TeacherRegister = () => {
   return (
     <div className="register-container">
       <div className="register-card">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          style={{ marginBottom: 12, background: 'transparent', border: 'none', color: '#2637A1', cursor: 'pointer' }}
+        >
+          ← На главную
+        </button>
         <h2>Регистрация учителя</h2>
         
         {error && <div className="error-message">{error}</div>}
