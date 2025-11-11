@@ -5,6 +5,11 @@ export const Container = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
 `;
 
 export const Header = styled.div`
@@ -17,6 +22,18 @@ export const Header = styled.div`
   background-repeat: no-repeat;
   position: relative;
   background-image: ${props => props.$backgroundImage ? `url(${props.$backgroundImage})` : 'none'};
+
+  @media (max-width: 1024px) {
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    padding: 24px;
+  }
+
+  @media (max-width: 768px) {
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding: 20px;
+  }
 `;
 
 export const Bar = styled.div`
@@ -29,6 +46,11 @@ export const Bar = styled.div`
   justify-content: space-between;
   position: relative;
   z-index: 2;
+
+  @media (max-width: 768px) {
+    height: 60px;
+    padding-right: 14px;
+  }
 `;
 
 export const HeaderLeft = styled.div`
@@ -43,6 +65,11 @@ export const Herb = styled.img`
   margin-left: 10px;
   margin-right: 14px;
   object-fit: contain;
+
+  @media (max-width: 480px) {
+    height: 40px;
+    width: 40px;
+  }
 `;
 
 export const HeaderTitle = styled.span`
@@ -50,18 +77,32 @@ export const HeaderTitle = styled.span`
   color: #313137;
   font-family: 'Inter', sans-serif;
   font-weight: 300;
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;
 
 export const HeaderRight = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 10px;
 `;
 
 export const HeaderVakancies = styled.div`
   margin-right: 50px;
   font-size: 16px;
   color: #313137;
+
+  @media (max-width: 768px) {
+    margin-right: 16px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 export const HeaderRightLogin = styled.button`
@@ -75,12 +116,20 @@ export const HeaderRightLogin = styled.button`
   &:hover {
     background-color: #1d2b7a;
   }
+
+  @media (max-width: 768px) {
+    padding: 8px 20px;
+  }
 `;
 
 export const HeaderRightLoginLink = styled.span`
   color: #FFFFFF;
   text-decoration: none;
   font-size: 16px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
 export const UserSection = styled.div`
@@ -88,12 +137,20 @@ export const UserSection = styled.div`
   align-items: center;
   gap: 15px;
   position: relative;
+
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
 `;
 
 export const UserName = styled.span`
   color: #313137;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 export const ProfileIconContainer = styled.div`
@@ -155,6 +212,21 @@ export const Title = styled.h1`
   position: relative;
   z-index: 2;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+  @media (max-width: 1024px) {
+    font-size: 56px;
+    margin-top: 140px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 42px;
+    margin-top: 100px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 34px;
+    margin-top: 80px;
+  }
 `;
 
 export const Text = styled.p`
@@ -169,6 +241,18 @@ export const Text = styled.p`
   position: relative;
   z-index: 2;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+  @media (max-width: 1024px) {
+    font-size: 22px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 `;
 
 export const InputContainer = styled.div`
@@ -181,6 +265,17 @@ export const InputContainer = styled.div`
   max-width: 1100px;
   position: relative;
   z-index: 2;
+
+  @media (max-width: 1024px) {
+    height: 56px;
+    max-width: 900px;
+  }
+
+  @media (max-width: 768px) {
+    height: 52px;
+    padding-left: 20px;
+    max-width: 100%;
+  }
 `;
 
 export const Input = styled.input`
@@ -192,6 +287,14 @@ export const Input = styled.input`
   border: none;
   outline: none;
   background: transparent;
+
+  @media (max-width: 1024px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 export const SearchButton = styled.button`
@@ -210,10 +313,20 @@ export const SearchButton = styled.button`
   &:hover {
     background-color: #1d2b7a;
   }
+
+  @media (max-width: 768px) {
+    height: 40px;
+    width: 40px;
+    margin-right: 10px;
+  }
 `;
 
 export const Main = styled.main`
   padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 16px 0;
+  }
 `;
 
 export const Grid = styled.div`
@@ -221,6 +334,10 @@ export const Grid = styled.div`
   flex-wrap: wrap;
   gap: 20px;
   margin: 12px 0;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
 `;
 
 export const LoadingContainer = styled.div`
@@ -295,12 +412,26 @@ export const TitleItem = styled.h3`
   margin-bottom: 20px;
   margin-top: 0;
   line-height: 1.2;
+
+  @media (max-width: 1024px) {
+    font-size: 26px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 export const RateContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 `;
 
 export const Price = styled.span`
@@ -309,6 +440,10 @@ export const Price = styled.span`
   font-weight: 400;
   font-size: 20px;
   margin-right: 12px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const Rate = styled.span`
@@ -316,6 +451,10 @@ export const Rate = styled.span`
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const TextItem = styled.p`
@@ -327,6 +466,15 @@ export const TextItem = styled.p`
   font-size: 20px;
   margin-bottom: 40px;
   line-height: 1.4;
+
+  @media (max-width: 1024px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
 `;
 
 export const MoreLink = styled(Link)`
@@ -363,5 +511,9 @@ export const CategoryText = styled.span`
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: 14px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
