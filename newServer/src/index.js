@@ -99,22 +99,22 @@ async function start() {
           return { error: 'Missing target email' };
         }
 
-        // Nodemailer transport - поддерживает Mailgun и другие SMTP сервисы
+        // Nodemailer transport - поддерживает Яндекс 360, Mailgun и другие SMTP сервисы
         const nodemailer = (await import('nodemailer')).default;
         
-        // Используем Mailgun SMTP если настроен, иначе fallback на другие настройки
+        // Настройки SMTP (поддерживает Яндекс 360, Mailgun и другие)
         const smtpConfig = {
-          host: process.env.SMTP_HOST || 'smtp.mailgun.org',
-          port: Number(process.env.SMTP_PORT || 587),
-          secure: !!(process.env.SMTP_SECURE === 'true'),
+          host: process.env.SMTP_HOST || 'smtp.yandex.ru',
+          port: Number(process.env.SMTP_PORT || 465),
+          secure: !!(process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465'),
           auth: process.env.SMTP_USER && process.env.SMTP_PASS ? {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
           } : undefined,
           // Увеличиваем таймауты для надежности
-          connectionTimeout: 10000,
-          greetingTimeout: 10000,
-          socketTimeout: 10000,
+          connectionTimeout: 15000,
+          greetingTimeout: 15000,
+          socketTimeout: 15000,
         };
         
         const transporter = nodemailer.createTransport(smtpConfig);
