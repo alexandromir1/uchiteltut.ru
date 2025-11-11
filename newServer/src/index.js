@@ -99,17 +99,25 @@ async function start() {
           return { error: 'Missing target email' };
         }
 
-        // Nodemailer transport
+        // Nodemailer transport - поддерживает Mailgun и другие SMTP сервисы
         const nodemailer = (await import('nodemailer')).default;
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
+        
+        // Используем Mailgun SMTP если настроен, иначе fallback на другие настройки
+        const smtpConfig = {
+          host: process.env.SMTP_HOST || 'smtp.mailgun.org',
           port: Number(process.env.SMTP_PORT || 587),
           secure: !!(process.env.SMTP_SECURE === 'true'),
           auth: process.env.SMTP_USER && process.env.SMTP_PASS ? {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
           } : undefined,
-        });
+          // Увеличиваем таймауты для надежности
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 10000,
+        };
+        
+        const transporter = nodemailer.createTransport(smtpConfig);
 
         const subject = `Отклик на вакансию: ${jobTitle || 'Без названия'} ${school ? '— ' + school : ''}`;
         const textBody = [
