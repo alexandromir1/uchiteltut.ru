@@ -44,14 +44,26 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
+  // Все хуки должны вызываться до условного возврата
+  const { data: statsData, loading: statsLoading, error: statsError } = useQuery(GET_STATISTICS, {
+    skip: !isAuthenticated,
+  });
+  const { data: jobsData, loading: jobsLoading } = useQuery(GET_JOBS, { 
+    variables: { active: true },
+    skip: !isAuthenticated,
+  });
+  const { data: teachersData, loading: teachersLoading } = useQuery(GET_TEACHERS, { 
+    variables: { publicOnly: false },
+    skip: !isAuthenticated,
+  });
+  const { data: responsesData, loading: responsesLoading } = useQuery(GET_RESPONSES, {
+    skip: !isAuthenticated,
+  });
+
   // Если не авторизован, показываем форму входа
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
   }
-  const { data: statsData, loading: statsLoading, error: statsError } = useQuery(GET_STATISTICS);
-  const { data: jobsData, loading: jobsLoading } = useQuery(GET_JOBS, { variables: { active: true } });
-  const { data: teachersData, loading: teachersLoading } = useQuery(GET_TEACHERS, { variables: { publicOnly: false } });
-  const { data: responsesData, loading: responsesLoading } = useQuery(GET_RESPONSES);
 
   if (statsLoading || jobsLoading || teachersLoading || responsesLoading) {
     return (
