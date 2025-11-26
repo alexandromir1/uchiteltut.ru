@@ -35,7 +35,7 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const SchoolProfile = () => {
   const { currentUser, updateUser } = useAuth();
   const navigate = useNavigate();
-  const { jobs, addJob, deleteJob, refetch } = useJobs();
+  const { jobs, addJob, deleteJob, refetch, loading: jobsLoading } = useJobs();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [newJob, setNewJob] = useState({
@@ -70,34 +70,66 @@ const SchoolProfile = () => {
   }, [currentUser]);
 
   // Получаем только вакансии текущей школы
-  const schoolJobs = jobs.filter(job => {
-    if (!currentUser) return false;
-    
-    const userId = parseInt(currentUser.id);
-    const schoolId = currentUser.school?.id ? parseInt(currentUser.school.id) : null;
-    
-    // Проверяем по userId (вакансия создана этим пользователем)
-    if (job.userId === userId || parseInt(job.userId) === userId) {
-      return true;
+  const schoolJobs = React.useMemo(() => {
+    if (!currentUser || !currentUser.id || !jobs || jobs.length === 0) {
+      return [];
     }
     
-    // Проверяем по user.id (если есть связь через user)
-    if (job.user?.id && (parseInt(job.user.id) === userId || job.user.id === String(userId))) {
-      return true;
+    // Нормализуем ID пользователя (может быть строка или число)
+    const currentUserId = typeof currentUser.id === 'string' ? parseInt(currentUser.id) : Number(currentUser.id);
+    const currentUserSchoolId = currentUser.school?.id 
+      ? (typeof currentUser.school.id === 'string' ? parseInt(currentUser.school.id) : Number(currentUser.school.id))
+      : null;
+    
+    const filtered = jobs.filter(job => {
+      if (!job) return false;
+      
+      // Нормализуем ID вакансии
+      const jobUserId = job.userId ? (typeof job.userId === 'string' ? parseInt(job.userId) : Number(job.userId)) : null;
+      const jobSchoolId = job.schoolId ? (typeof job.schoolId === 'string' ? parseInt(job.schoolId) : Number(job.schoolId)) : null;
+      
+      // Проверяем по userId (вакансия создана этим пользователем) - основной способ
+      if (jobUserId && jobUserId === currentUserId) {
+        return true;
+      }
+      
+      // Проверяем по user.id (если есть связь через user)
+      if (job.user?.id) {
+        const jobUserDbId = typeof job.user.id === 'string' ? parseInt(job.user.id) : Number(job.user.id);
+        if (jobUserDbId === currentUserId) {
+          return true;
+        }
+      }
+      
+      // Проверяем по schoolId (если есть связь со школой)
+      if (currentUserSchoolId && jobSchoolId && jobSchoolId === currentUserSchoolId) {
+        return true;
+      }
+      
+      // Проверяем по schoolInfo.id
+      if (currentUserSchoolId && job.schoolInfo?.id) {
+        const jobSchoolInfoId = typeof job.schoolInfo.id === 'string' ? parseInt(job.schoolInfo.id) : Number(job.schoolInfo.id);
+        if (jobSchoolInfoId === currentUserSchoolId) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
+    
+    // Отладочная информация (можно убрать после проверки)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('SchoolProfile - Filtering jobs:', {
+        totalJobs: jobs.length,
+        filteredJobs: filtered.length,
+        currentUserId,
+        currentUserSchoolId,
+        jobs: jobs.map(j => ({ id: j.id, userId: j.userId, schoolId: j.schoolId, user: j.user?.id, schoolInfo: j.schoolInfo?.id }))
+      });
     }
     
-    // Проверяем по schoolId (если есть связь со школой)
-    if (schoolId && job.schoolId && (parseInt(job.schoolId) === schoolId || job.schoolId === String(schoolId))) {
-      return true;
-    }
-    
-    // Проверяем по schoolInfo.id
-    if (schoolId && job.schoolInfo?.id && (parseInt(job.schoolInfo.id) === schoolId || job.schoolInfo.id === String(schoolId))) {
-      return true;
-    }
-    
-    return false;
-  });
+    return filtered;
+  }, [jobs, currentUser]);
 
   useEffect(() => {
     if (currentUser) {
@@ -149,7 +181,7 @@ const SchoolProfile = () => {
       });
 
       // Обновляем список вакансий
-      refetch();
+      await refetch();
 
       toast.success('Вакансия успешно добавлена!');
     } catch (error) {

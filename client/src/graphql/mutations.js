@@ -52,6 +52,8 @@ export const CREATE_JOB = gql`
   mutation CreateJob($input: JobInput!) {
     createJob(input: $input) {
       id
+      schoolId
+      userId
       position
       school
       region
@@ -67,6 +69,16 @@ export const CREATE_JOB = gql`
       openDate
       isActive
       createdAt
+      schoolInfo {
+        id
+        schoolName
+        district
+      }
+      user {
+        id
+        name
+        email
+      }
     }
   }
 `;
