@@ -10,6 +10,7 @@ export const useJobs = () => {
 
   const [createJobMutation] = useMutation(CREATE_JOB, {
     refetchQueries: [{ query: GET_JOBS, variables: { active: true } }],
+    awaitRefetchQueries: true,
   });
 
   const [deleteJobMutation] = useMutation(DELETE_JOB, {

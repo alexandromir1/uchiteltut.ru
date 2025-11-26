@@ -71,7 +71,16 @@ const SchoolProfile = () => {
 
   // Получаем только вакансии текущей школы
   const schoolJobs = React.useMemo(() => {
-    if (!currentUser || !currentUser.id || !jobs || jobs.length === 0) {
+    console.log('SchoolProfile - Filtering jobs, currentUser:', currentUser);
+    console.log('SchoolProfile - All jobs:', jobs);
+    
+    if (!currentUser || !currentUser.id) {
+      console.log('SchoolProfile - No currentUser or currentUser.id');
+      return [];
+    }
+    
+    if (!jobs || jobs.length === 0) {
+      console.log('SchoolProfile - No jobs available');
       return [];
     }
     
@@ -81,6 +90,8 @@ const SchoolProfile = () => {
       ? (typeof currentUser.school.id === 'string' ? parseInt(currentUser.school.id) : Number(currentUser.school.id))
       : null;
     
+    console.log('SchoolProfile - Current userId:', currentUserId, 'schoolId:', currentUserSchoolId);
+    
     const filtered = jobs.filter(job => {
       if (!job) return false;
       
@@ -88,8 +99,11 @@ const SchoolProfile = () => {
       const jobUserId = job.userId ? (typeof job.userId === 'string' ? parseInt(job.userId) : Number(job.userId)) : null;
       const jobSchoolId = job.schoolId ? (typeof job.schoolId === 'string' ? parseInt(job.schoolId) : Number(job.schoolId)) : null;
       
+      console.log(`Job ${job.id}: userId=${jobUserId}, schoolId=${jobSchoolId}, user.id=${job.user?.id}, schoolInfo.id=${job.schoolInfo?.id}`);
+      
       // Проверяем по userId (вакансия создана этим пользователем) - основной способ
       if (jobUserId && jobUserId === currentUserId) {
+        console.log(`Job ${job.id} matches by userId`);
         return true;
       }
       
@@ -97,12 +111,14 @@ const SchoolProfile = () => {
       if (job.user?.id) {
         const jobUserDbId = typeof job.user.id === 'string' ? parseInt(job.user.id) : Number(job.user.id);
         if (jobUserDbId === currentUserId) {
+          console.log(`Job ${job.id} matches by user.id`);
           return true;
         }
       }
       
       // Проверяем по schoolId (если есть связь со школой)
       if (currentUserSchoolId && jobSchoolId && jobSchoolId === currentUserSchoolId) {
+        console.log(`Job ${job.id} matches by schoolId`);
         return true;
       }
       
@@ -110,6 +126,7 @@ const SchoolProfile = () => {
       if (currentUserSchoolId && job.schoolInfo?.id) {
         const jobSchoolInfoId = typeof job.schoolInfo.id === 'string' ? parseInt(job.schoolInfo.id) : Number(job.schoolInfo.id);
         if (jobSchoolInfoId === currentUserSchoolId) {
+          console.log(`Job ${job.id} matches by schoolInfo.id`);
           return true;
         }
       }
@@ -117,16 +134,8 @@ const SchoolProfile = () => {
       return false;
     });
     
-    // Отладочная информация (можно убрать после проверки)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('SchoolProfile - Filtering jobs:', {
-        totalJobs: jobs.length,
-        filteredJobs: filtered.length,
-        currentUserId,
-        currentUserSchoolId,
-        jobs: jobs.map(j => ({ id: j.id, userId: j.userId, schoolId: j.schoolId, user: j.user?.id, schoolInfo: j.schoolInfo?.id }))
-      });
-    }
+    console.log('SchoolProfile - Filtered jobs:', filtered.length, 'out of', jobs.length);
+    console.log('SchoolProfile - Filtered job IDs:', filtered.map(j => j.id));
     
     return filtered;
   }, [jobs, currentUser]);
@@ -164,7 +173,10 @@ const SchoolProfile = () => {
         open_date: new Date().toISOString()
       };
 
-      await addJob(jobData);
+      const result = await addJob(jobData);
+      console.log('Job creation result:', result);
+      console.log('Created job userId:', result?.userId, 'schoolId:', result?.schoolId);
+      console.log('Current user id:', currentUser?.id);
 
       // Очищаем форму
       setNewJob({
@@ -180,8 +192,29 @@ const SchoolProfile = () => {
         studentEmployment: ''
       });
 
-      // Обновляем список вакансий
+      // Принудительно обновляем список вакансий
+      console.log('Refetching jobs after creation...');
       await refetch();
+      
+      // Дополнительная проверка через небольшую задержку
+      setTimeout(async () => {
+        console.log('Second refetch after delay...');
+        const refetchResult = await refetch();
+        console.log('Refetch result:', refetchResult);
+        console.log('Current user:', currentUser);
+        console.log('All jobs after refetch:', refetchResult.data?.jobs);
+        if (refetchResult.data?.jobs) {
+          const jobDetails = refetchResult.data.jobs.map(j => ({
+            id: j.id,
+            position: j.position,
+            userId: j.userId,
+            schoolId: j.schoolId,
+            user: j.user?.id,
+            schoolInfo: j.schoolInfo?.id
+          }));
+          console.log('Job details:', jobDetails);
+        }
+      }, 500);
 
       toast.success('Вакансия успешно добавлена!');
     } catch (error) {
