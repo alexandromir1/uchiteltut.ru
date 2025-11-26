@@ -70,7 +70,34 @@ const SchoolProfile = () => {
   }, [currentUser]);
 
   // Получаем только вакансии текущей школы
-  const schoolJobs = jobs.filter(job => job.school_id === currentUser?.id);
+  const schoolJobs = jobs.filter(job => {
+    if (!currentUser) return false;
+    
+    const userId = parseInt(currentUser.id);
+    const schoolId = currentUser.school?.id ? parseInt(currentUser.school.id) : null;
+    
+    // Проверяем по userId (вакансия создана этим пользователем)
+    if (job.userId === userId || parseInt(job.userId) === userId) {
+      return true;
+    }
+    
+    // Проверяем по user.id (если есть связь через user)
+    if (job.user?.id && (parseInt(job.user.id) === userId || job.user.id === String(userId))) {
+      return true;
+    }
+    
+    // Проверяем по schoolId (если есть связь со школой)
+    if (schoolId && job.schoolId && (parseInt(job.schoolId) === schoolId || job.schoolId === String(schoolId))) {
+      return true;
+    }
+    
+    // Проверяем по schoolInfo.id
+    if (schoolId && job.schoolInfo?.id && (parseInt(job.schoolInfo.id) === schoolId || job.schoolInfo.id === String(schoolId))) {
+      return true;
+    }
+    
+    return false;
+  });
 
   useEffect(() => {
     if (currentUser) {

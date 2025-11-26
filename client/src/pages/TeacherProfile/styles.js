@@ -4,6 +4,10 @@ export const Container = styled.div`
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 `;
 
 export const Header = styled.div`
@@ -14,6 +18,12 @@ export const Header = styled.div`
   background-size: cover;
   background-position: center;
   background-image: ${props => props.backgroundImage ? `url(${props.backgroundImage})` : 'none'};
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
 `;
 
 export const Bar = styled.div`
@@ -24,11 +34,24 @@ export const Bar = styled.div`
   background-color: #fff;
   border-radius: 40px;
   padding: 0 20px;
+
+  @media (max-width: 768px) {
+    height: auto;
+    min-height: 60px;
+    padding: 10px 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 `;
 
 export const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 `;
 
 export const Herb = styled.img`
@@ -53,6 +76,15 @@ export const LogoutButton = styled.button`
   font-size: 16px;
   font-weight: 500;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 
   &:hover {
     background-color: #1d2b7a;
@@ -71,6 +103,11 @@ export const Title = styled.h1`
   font-weight: 500;
   margin-top: 120px;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+    margin-top: 40px;
+  }
 `;
 
 export const Text = styled.p`
@@ -78,10 +115,19 @@ export const Text = styled.p`
   color: #fff;
   max-width: 500px;
   font-family: 'Raleway', sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    max-width: 100%;
+  }
 `;
 
 export const Main = styled.main`
   padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
 `;
 
 export const Section = styled.section`
@@ -90,6 +136,12 @@ export const Section = styled.section`
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+  }
 `;
 
 export const SectionTitle = styled.h2`
@@ -97,6 +149,11 @@ export const SectionTitle = styled.h2`
   color: #25258E;
   margin-bottom: 20px;
   font-family: 'Raleway', sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
 `;
 
 export const Form = styled.div`
@@ -226,7 +283,10 @@ export const TextCenter = styled.p`
 
 export const LoginButton = styled.button`
   margin: 20px auto;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background-color: #2637A1;
   color: #fff;
   border: none;
@@ -237,6 +297,11 @@ export const LoginButton = styled.button`
   font-size: 16px;
   font-weight: 500;
   transition: background-color 0.3s ease, transform 0.2s ease;
+
+  @media (max-width: 768px) {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
 
   &:hover {
     background-color: #1d2b7a;
@@ -261,7 +326,14 @@ export const ButtonBack = styled.button`
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 
   &:hover {
     background-color: #2637A1;
@@ -285,6 +357,15 @@ export const ButtonPrimary = styled.button`
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
 
   &:hover {
     background-color: #1d2b7a;

@@ -35,6 +35,8 @@ export const GET_JOBS = gql`
   query GetJobs($active: Boolean) {
     jobs(active: $active) {
       id
+      schoolId
+      userId
       position
       school
       region

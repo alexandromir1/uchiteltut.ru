@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { GET_JOBS } from "../../graphql/queries";
 import toast from "react-hot-toast";
 import background from "../../assets/background.png";
 import herb from "../../assets/herb.png";
@@ -56,6 +58,40 @@ const ProfileTeacher = () => {
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [viewedJobsData, setViewedJobsData] = useState([]);
+
+  // Загружаем все вакансии для получения данных просмотренных
+  const { data: jobsData } = useQuery(GET_JOBS, {
+    variables: { active: true },
+    skip: !currentUser,
+    errorPolicy: 'all',
+  });
+
+  // Загружаем данные просмотренных вакансий
+  useEffect(() => {
+    if (!jobsData?.jobs) return;
+
+    const viewedJobIds = JSON.parse(localStorage.getItem("viewedJobs") || "[]");
+    if (viewedJobIds.length === 0) {
+      setViewedJobsData([]);
+      return;
+    }
+
+    // Получаем полные данные вакансий по сохраненным ID
+    const jobs = jobsData.jobs.filter(job => 
+      viewedJobIds.includes(job.id) || viewedJobIds.includes(String(job.id))
+    );
+
+    // Преобразуем в формат для отображения
+    const jobsForDisplay = jobs.map(job => ({
+      id: job.id,
+      position: job.position,
+      school: job.school,
+      region: job.region,
+    }));
+
+    setViewedJobsData(jobsForDisplay);
+  }, [jobsData]);
 
   // Сохраняем профиль при изменении
   useEffect(() => {
@@ -247,13 +283,14 @@ const ProfileTeacher = () => {
 
         <Section>
           <SectionTitle>⭐ Просмотренные вакансии</SectionTitle>
-          {profile.viewedJobs.length === 0 ? (
+          {viewedJobsData.length === 0 ? (
             <NoFiles>Вы пока не просматривали вакансии</NoFiles>
           ) : (
             <JobList>
-              {profile.viewedJobs.map((job, i) => (
-                <JobItem key={i}>
+              {viewedJobsData.map((job) => (
+                <JobItem key={job.id}>
                   <strong>{job.position}</strong> — {job.school}
+                  {job.region && <span> ({job.region})</span>}
                 </JobItem>
               ))}
             </JobList>
