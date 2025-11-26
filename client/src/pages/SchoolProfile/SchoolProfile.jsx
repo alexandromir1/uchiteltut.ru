@@ -71,71 +71,82 @@ const SchoolProfile = () => {
 
   // Получаем только вакансии текущей школы
   const schoolJobs = React.useMemo(() => {
-    console.log('SchoolProfile - Filtering jobs, currentUser:', currentUser);
-    console.log('SchoolProfile - All jobs:', jobs);
+    console.log('=== SchoolProfile - Filtering jobs ===');
+    console.log('Current user:', currentUser);
+    console.log('All jobs count:', jobs?.length || 0);
+    console.log('All jobs:', jobs);
     
     if (!currentUser || !currentUser.id) {
-      console.log('SchoolProfile - No currentUser or currentUser.id');
+      console.log('❌ No currentUser or currentUser.id');
       return [];
     }
     
     if (!jobs || jobs.length === 0) {
-      console.log('SchoolProfile - No jobs available');
+      console.log('❌ No jobs available');
       return [];
     }
     
-    // Нормализуем ID пользователя (может быть строка или число)
-    const currentUserId = typeof currentUser.id === 'string' ? parseInt(currentUser.id) : Number(currentUser.id);
+    // Нормализуем ID пользователя - принимаем и строку и число
+    const currentUserIdStr = String(currentUser.id);
+    const currentUserIdNum = typeof currentUser.id === 'string' ? parseInt(currentUser.id, 10) : Number(currentUser.id);
+    
     const currentUserSchoolId = currentUser.school?.id 
-      ? (typeof currentUser.school.id === 'string' ? parseInt(currentUser.school.id) : Number(currentUser.school.id))
+      ? (typeof currentUser.school.id === 'string' ? parseInt(currentUser.school.id, 10) : Number(currentUser.school.id))
       : null;
     
-    console.log('SchoolProfile - Current userId:', currentUserId, 'schoolId:', currentUserSchoolId);
+    console.log('Current userId (string):', currentUserIdStr);
+    console.log('Current userId (number):', currentUserIdNum);
+    console.log('Current schoolId:', currentUserSchoolId);
     
     const filtered = jobs.filter(job => {
       if (!job) return false;
       
-      // Нормализуем ID вакансии
-      const jobUserId = job.userId ? (typeof job.userId === 'string' ? parseInt(job.userId) : Number(job.userId)) : null;
-      const jobSchoolId = job.schoolId ? (typeof job.schoolId === 'string' ? parseInt(job.schoolId) : Number(job.schoolId)) : null;
+      // Нормализуем ID вакансии - пробуем оба варианта
+      const jobUserIdNum = job.userId ? (typeof job.userId === 'string' ? parseInt(job.userId, 10) : Number(job.userId)) : null;
+      const jobUserIdStr = job.userId ? String(job.userId) : null;
+      const jobSchoolId = job.schoolId ? (typeof job.schoolId === 'string' ? parseInt(job.schoolId, 10) : Number(job.schoolId)) : null;
       
-      console.log(`Job ${job.id}: userId=${jobUserId}, schoolId=${jobSchoolId}, user.id=${job.user?.id}, schoolInfo.id=${job.schoolInfo?.id}`);
+      const jobUserDbIdStr = job.user?.id ? String(job.user.id) : null;
+      const jobUserDbIdNum = job.user?.id ? (typeof job.user.id === 'string' ? parseInt(job.user.id, 10) : Number(job.user.id)) : null;
+      
+      console.log(`Job ${job.id}: userId=${job.userId} (str: ${jobUserIdStr}, num: ${jobUserIdNum}), user.id=${job.user?.id} (str: ${jobUserDbIdStr}, num: ${jobUserDbIdNum}), schoolId=${job.schoolId}`);
       
       // Проверяем по userId (вакансия создана этим пользователем) - основной способ
-      if (jobUserId && jobUserId === currentUserId) {
-        console.log(`Job ${job.id} matches by userId`);
+      // Сравниваем и строки и числа
+      if (jobUserIdNum && (jobUserIdNum === currentUserIdNum || jobUserIdStr === currentUserIdStr)) {
+        console.log(`✅ Job ${job.id} matches by userId`);
         return true;
       }
       
-      // Проверяем по user.id (если есть связь через user)
-      if (job.user?.id) {
-        const jobUserDbId = typeof job.user.id === 'string' ? parseInt(job.user.id) : Number(job.user.id);
-        if (jobUserDbId === currentUserId) {
-          console.log(`Job ${job.id} matches by user.id`);
-          return true;
-        }
+      // Проверяем по user.id (если есть связь через user) - сравниваем и строки и числа
+      if (jobUserDbIdNum && (jobUserDbIdNum === currentUserIdNum || jobUserDbIdStr === currentUserIdStr)) {
+        console.log(`✅ Job ${job.id} matches by user.id`);
+        return true;
       }
       
       // Проверяем по schoolId (если есть связь со школой)
       if (currentUserSchoolId && jobSchoolId && jobSchoolId === currentUserSchoolId) {
-        console.log(`Job ${job.id} matches by schoolId`);
+        console.log(`✅ Job ${job.id} matches by schoolId`);
         return true;
       }
       
       // Проверяем по schoolInfo.id
       if (currentUserSchoolId && job.schoolInfo?.id) {
-        const jobSchoolInfoId = typeof job.schoolInfo.id === 'string' ? parseInt(job.schoolInfo.id) : Number(job.schoolInfo.id);
+        const jobSchoolInfoId = typeof job.schoolInfo.id === 'string' ? parseInt(job.schoolInfo.id, 10) : Number(job.schoolInfo.id);
         if (jobSchoolInfoId === currentUserSchoolId) {
-          console.log(`Job ${job.id} matches by schoolInfo.id`);
+          console.log(`✅ Job ${job.id} matches by schoolInfo.id`);
           return true;
         }
       }
       
+      console.log(`❌ Job ${job.id} does NOT match`);
       return false;
     });
     
-    console.log('SchoolProfile - Filtered jobs:', filtered.length, 'out of', jobs.length);
-    console.log('SchoolProfile - Filtered job IDs:', filtered.map(j => j.id));
+    console.log('=== Filtering results ===');
+    console.log(`✅ Filtered jobs: ${filtered.length} out of ${jobs.length}`);
+    console.log('Filtered job IDs:', filtered.map(j => j.id));
+    console.log('Filtered jobs:', filtered);
     
     return filtered;
   }, [jobs, currentUser]);
@@ -146,6 +157,12 @@ const SchoolProfile = () => {
       setLoading(false);
     }
   }, [currentUser, fetchProfile]);
+
+  // Отладочный эффект для отслеживания изменений
+  useEffect(() => {
+    console.log('SchoolProfile - Jobs changed:', jobs.length);
+    console.log('SchoolProfile - Filtered jobs count:', schoolJobs.length);
+  }, [jobs, schoolJobs]);
 
   const handleAddJob = async (e) => {
     e.preventDefault();
