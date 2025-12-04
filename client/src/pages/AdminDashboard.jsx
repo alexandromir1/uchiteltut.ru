@@ -98,7 +98,7 @@ const AdminDashboard = () => {
   // Таблица вакансий по регионам
   const jobsByRegionColumns = [
     {
-      title: 'Регион',
+      title: 'Район',
       dataIndex: 'region',
       key: 'region',
     },
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
       ),
     },
     {
-      title: 'Регион',
+      title: 'Район',
       key: 'region',
       width: 120,
       responsive: ['md'],
@@ -294,7 +294,7 @@ const AdminDashboard = () => {
         {/* Статистика по регионам */}
         <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
           <Col xs={24} md={12}>
-            <Card title="Вакансии по регионам" bordered={false}>
+            <Card title="Вакансии по районам" bordered={false}>
               <Table
                 dataSource={stats.jobsByRegion || []}
                 columns={jobsByRegionColumns}

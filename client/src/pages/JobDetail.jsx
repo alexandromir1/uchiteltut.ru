@@ -186,7 +186,7 @@ function JobDetail() {
               </div>
 
               <div style={styles.contactItem}>
-                <span style={styles.contactLabel}>Регион:</span>
+                <span style={styles.contactLabel}>Район:</span>
                 <span style={styles.contactValue}>{job.region}</span>
               </div>
 
@@ -589,19 +589,6 @@ const styles = {
     minHeight: 80,
     resize: 'vertical'
   }
-};
-
-// Добавляем hover эффекты через CSS или инлайн
-styles.backButton[':hover'] = {
-  color: '#1c2a7a'
-};
-
-styles.emailLink[':hover'] = {
-  color: '#1c2a7a'
-};
-
-styles.applyButton[':hover'] = {
-  backgroundColor: '#1c2a7a'
 };
 
 export default JobDetail;

@@ -17,6 +17,7 @@ import TeacherRegister from './pages/TeacherRegister';
 import SchoolRegister from './pages/SchoolRegister';
 import TeacherResumes from './pages/TeacherResumes';
 import AdminDashboard from './pages/AdminDashboard';
+import ChatbotWidget from './components/ChatbotWidget';
 import './App.css';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             }}
           />
           <div className="App">
+            <ChatbotWidget />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />

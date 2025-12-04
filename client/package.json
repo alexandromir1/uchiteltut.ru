@@ -20,6 +20,7 @@
     "react-native-web": "^0.21.2",
     "react-router-dom": "^7.9.1",
     "react-scripts": "5.0.1",
+    "shebang-regex": "^4.0.0",
     "styled-components": "^6.1.19",
     "web-vitals": "^2.1.4"
   },
